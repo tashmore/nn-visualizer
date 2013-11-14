@@ -3,34 +3,70 @@
 <head>
     <title>Neural Net Visualizer</title>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <style type="text/css">
+        #net {
+            margin:0 auto;
+            text-align: center;
+        }
+
+        .node {
+            stroke:black;
+            stroke-width: 4;
+        }
+    </style>
 </head>
 
 <body>
+    <h1>Neural Net Visualizer</h1>
     <div id='net'></div>
 
     <script type="text/javascript">
+        function computeValues(weights, input) {
+            function activation(v) {
+                return 1/(1+Math.exp(-v))
+            }
+
+            values = [input]
+            for (var fromLayer = 0; fromLayer < weights.length; fromLayer++) {
+                values.push([])
+                for (var toNode = 0; toNode < weights[fromLayer][0].length; toNode++) {
+                    values[fromLayer+1].push(0)
+                    for (var fromNode = 0; fromNode < weights[fromLayer].length; fromNode++) {
+                        values[fromLayer+1][toNode] += weights[fromLayer][fromNode][toNode] * values[fromLayer][fromNode]
+                    }
+                    values[fromLayer+1][toNode] = activation(values[fromLayer+1][toNode])
+                }
+                if (fromLayer < weights.length - 1)
+                    values[fromLayer+1].push(1)
+            }
+            console.log(values)
+            return values
+        }
+
         function drawNN(weights, nodeValues) {
 
             var svg = d3.select('#net').append("svg")
-                                  .attr("width", 1000)
+                                  .attr("width", 800)
                                   .attr("height", 800)
                                   .attr("class", "chart")
             svg.append("g").attr("id", "edges")
             svg.append("g").attr("id", "nodes")
 
-            drawNodes(nodeValues)
+            drawNodes(svg, nodeValues)
             var nodeData = d3.selectAll('.layer').data()
-            drawEdges(weights, nodeData)
+            drawEdges(svg, weights, nodeData)
         }
 
-        function drawEdges(weights, nodeData) {
+        function drawEdges(svg, weights, nodeData) {
             function getEdgeData(fromLayer, fromNode, toNode, weight) {
                 var fromNode = nodeData[fromLayer][fromNode]
                 var toNode = nodeData[fromLayer + 1][toNode]
 
-                return {x1: fromNode.x + fromNode.width,
+                var padding = 5
+
+                return {x1: fromNode.x + fromNode.width - padding,
                         y1: fromNode.y + fromNode.height/2,
-                        x2: toNode.x,
+                        x2: toNode.x + padding,
                         y2: toNode.y + toNode.height/2,
                         weight: weight}
             }
@@ -44,7 +80,7 @@
                 }
             }
 
-            d3.select('svg').select('#edges').selectAll('.edge')
+            svg.select('#edges').selectAll('.edge')
                             .data(data)
                           .enter().append('svg:line')
                             .attr('class', 'edge')
@@ -52,18 +88,20 @@
                             .attr("y1", function(d) { return d.y1; })
                             .attr("x2", function(d) { return d.x2; })
                             .attr("y2", function(d) { return d.y2; })
-                            .style('stroke-width', function(d) { return 10*Math.abs(d.weight); })
+                            .style('stroke-width', function(d) { return 5*Math.abs(d.weight); })
                             .style('stroke', function(d) { return d.weight > 0 ? 'blue' : 'red' })
         }
 
-        function drawNodes(nodeValues) {
+        function drawNodes(svg, nodeValues) {
             function getNodeData(layerIdx, nodeIdx, value) {
-                var width = 50
-                var height = 50
-                var wPadding = 100
-                var hPadding = 15
-                return {x: layerIdx * (width + wPadding),
-                        y: nodeIdx * (height + hPadding),
+                var originX = 10
+                var originY = 10
+                var width = 100
+                var height = 100
+                var wPadding = 200
+                var hPadding = 30
+                return {x: originX + layerIdx * (width + wPadding),
+                        y: originY + nodeIdx * (height + hPadding),
                         width: width,
                         height: height,
                         value: nodeValues[layerIdx][nodeIdx]}
@@ -77,7 +115,7 @@
                 }
             }
 
-            var layer = d3.select('svg').select('#nodes').selectAll(".layer")
+            var layer = svg.select('#nodes').selectAll(".layer")
                             .data(data)
                           .enter().append("svg:g")
                             .attr("class", "layer")
@@ -88,6 +126,8 @@
                          .attr("class", "node")
                          .attr("x", function(d) { return d.x; })
                          .attr("y", function(d) { return d.y; })
+                         .attr('rx', 10)
+                         .attr('ry', 10)
                          .attr("width", function(d) { return d.width; })
                          .attr("height", function(d) { return d.height; })
                          .style("fill", function(d) { var v = Math.floor(255*(1-d.value)); return "rgb("+v+","+v+","+v+")" })
@@ -95,15 +135,12 @@
                          .text(function(d) { return d.value; });
         }
 
-        drawNN(
-            // weights
-            [
+        var weights = [
               [ [.4, -.5], [.001, 2.3], [-.1, .2], [.3, .4] ],
               [ [1.2], [-1.2], [-0.1] ]
-            ],
-
-            // values
-            [ [.1, .2, .3, 1], [.5, .4, 1], [.9] ])
+            ]
+        
+        drawNN(weights, computeValues(weights, [.1, .2, .3, 1]))
     </script>
 </body>
 </html>
