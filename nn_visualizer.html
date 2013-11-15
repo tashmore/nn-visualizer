@@ -3,6 +3,7 @@
 <head>
     <title>Neural Net Visualizer</title>
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="nn.js"></script>
     <style type="text/css">
         #net {
             margin: 0 auto;
@@ -28,9 +29,11 @@
          <div id='net'></div>
          <div id='output'></div>
          <div style="width:100%" id='bottom'>
-             Selected node value: <div id='selectedValue'>none</div>
-             <button>Gradient Ascent</button>
-             <button>Gradient Descent</button>
+             Selected node value: <span id='selectedValue'>none</span>
+             <div>
+             <button onclick="javascript:gradientAscent()">Gradient Ascent</button>
+             <button onclick="javascript:gradientDescent()">Gradient Descent</button>
+             </div>
          </div>
      </div>
 </code>
@@ -46,27 +49,6 @@
                                       .attr("class", "chart")
                 svg.append("g").attr("id", "edges")
                 svg.append("g").attr("id", "nodes")
-        }
-
-        function feedForward(weights, input) {
-            function activation(v) {
-                return 1/(1+Math.exp(-v))
-            }
-
-            values = [input]
-            for (var fromLayer = 0; fromLayer < weights.length; fromLayer++) {
-                values.push([])
-                for (var toNode = 0; toNode < weights[fromLayer][0].length; toNode++) {
-                    values[fromLayer+1].push(0)
-                    for (var fromNode = 0; fromNode < weights[fromLayer].length; fromNode++) {
-                        values[fromLayer+1][toNode] += weights[fromLayer][fromNode][toNode] * values[fromLayer][fromNode]
-                    }
-                    values[fromLayer+1][toNode] = activation(values[fromLayer+1][toNode])
-                }
-                if (fromLayer < weights.length - 1)
-                    values[fromLayer+1].push(1)
-            }
-            return values
         }
 
         function drawNN(weights, input) {
@@ -115,7 +97,7 @@
                 selectedNode.classed('hl', false)
             selectedNode = sel
             selectedNode.classed('hl', true)
-            d3.select('#selectedValue').text(sel.data()[0].value)
+            d3.select('#selectedValue').text(selectedNode.data()[0].value)
         }
 
         function drawNodes(svg, nodeValues) {
@@ -166,9 +148,10 @@
               [ [.4, -.5], [.001, 2.3], [-.1, .2], [.3, .4] ],
               [ [1.2], [-1.2], [-0.1] ]
             ]
+        var input = [.1, .2, .3, 1]
         
         initCanvas()
-        drawNN(weights, [.1, .2, .3, 1])
+        drawNN(weights, input)
     </script>
 </body>
 </html>
