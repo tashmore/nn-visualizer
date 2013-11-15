@@ -21,7 +21,17 @@
     <div id='net'></div>
 
     <script type="text/javascript">
-        function computeValues(weights, input) {
+        var svg;
+        function initCanvas() {
+            svg = d3.select('#net').append("svg")
+                                      .attr("width", 800)
+                                      .attr("height", 800)
+                                      .attr("class", "chart")
+                svg.append("g").attr("id", "edges")
+                svg.append("g").attr("id", "nodes")
+        }
+
+        function feedForward(weights, input) {
             function activation(v) {
                 return 1/(1+Math.exp(-v))
             }
@@ -39,20 +49,11 @@
                 if (fromLayer < weights.length - 1)
                     values[fromLayer+1].push(1)
             }
-            console.log(values)
             return values
         }
 
-        function drawNN(weights, nodeValues) {
-
-            var svg = d3.select('#net').append("svg")
-                                  .attr("width", 800)
-                                  .attr("height", 800)
-                                  .attr("class", "chart")
-            svg.append("g").attr("id", "edges")
-            svg.append("g").attr("id", "nodes")
-
-            drawNodes(svg, nodeValues)
+        function drawNN(weights, input) {
+            drawNodes(svg, feedForward(weights, input))
             var nodeData = d3.selectAll('.layer').data()
             drawEdges(svg, weights, nodeData)
         }
@@ -88,7 +89,7 @@
                             .attr("y1", function(d) { return d.y1; })
                             .attr("x2", function(d) { return d.x2; })
                             .attr("y2", function(d) { return d.y2; })
-                            .style('stroke-width', function(d) { return 5*Math.abs(d.weight); })
+                            .style('stroke-width', function(d) { return 5 * Math.abs(d.weight) })
                             .style('stroke', function(d) { return d.weight > 0 ? 'blue' : 'red' })
         }
 
@@ -116,23 +117,23 @@
             }
 
             var layer = svg.select('#nodes').selectAll(".layer")
-                            .data(data)
-                          .enter().append("svg:g")
-                            .attr("class", "layer")
+                           .data(data)
+            layer.enter().append("svg:g")
+                           .attr("class", "layer")
 
-            var col = layer.selectAll(".node")
-                         .data(function (d) { return d; })
-                        .enter().append("svg:rect")
-                         .attr("class", "node")
-                         .attr("x", function(d) { return d.x; })
-                         .attr("y", function(d) { return d.y; })
-                         .attr('rx', 10)
-                         .attr('ry', 10)
-                         .attr("width", function(d) { return d.width; })
-                         .attr("height", function(d) { return d.height; })
-                         .style("fill", function(d) { var v = Math.floor(255*(1-d.value)); return "rgb("+v+","+v+","+v+")" })
-                         .append("svg:title")
-                         .text(function(d) { return d.value; });
+            var nodes = layer.selectAll(".node")
+                             .data(function (d) { return d; })
+            nodes.enter().append("svg:rect")
+                 .attr("class", "node")
+            nodes.attr("x", function(d) { return d.x; })
+                 .attr("y", function(d) { return d.y; })
+                 .attr('rx', 10)
+                 .attr('ry', 10)
+                 .attr("width", function(d) { return d.width; })
+                 .attr("height", function(d) { return d.height; })
+                 .style("fill", function(d) { var v = Math.floor(255 * (1 - d.value)); return "rgb("+v+","+v+","+v+")" })
+                 .append("svg:title")
+                 .text(function(d) { return d.value; });
         }
 
         var weights = [
@@ -140,7 +141,8 @@
               [ [1.2], [-1.2], [-0.1] ]
             ]
         
-        drawNN(weights, computeValues(weights, [.1, .2, .3, 1]))
+        initCanvas()
+        drawNN(weights, [.1, .2, .3, 1])
     </script>
 </body>
 </html>
