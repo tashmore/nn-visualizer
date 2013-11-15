@@ -5,27 +5,44 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <style type="text/css">
         #net {
-            margin:0 auto;
+            margin: 0 auto;
             text-align: center;
         }
 
         .node {
-            stroke:black;
+            stroke: black;
             stroke-width: 4;
+        }
+
+        .node.hl {
+            stroke: red;
         }
     </style>
 </head>
 
 <body>
     <h1>Neural Net Visualizer</h1>
-    <div id='net'></div>
+    <code>
+     <div style="width:100%">
+         <div id='input'></div>
+         <div id='net'></div>
+         <div id='output'></div>
+         <div style="width:100%" id='bottom'>
+             Selected node value: <div id='selectedValue'>none</div>
+             <button>Gradient Ascent</button>
+             <button>Gradient Descent</button>
+         </div>
+     </div>
+</code>
 
     <script type="text/javascript">
         var svg;
+        var selectedNode;
+
         function initCanvas() {
             svg = d3.select('#net').append("svg")
                                       .attr("width", 800)
-                                      .attr("height", 800)
+                                      .attr("height", 600)
                                       .attr("class", "chart")
                 svg.append("g").attr("id", "edges")
                 svg.append("g").attr("id", "nodes")
@@ -93,6 +110,14 @@
                             .style('stroke', function(d) { return d.weight > 0 ? 'blue' : 'red' })
         }
 
+        function setSelected(sel) {
+            if (selectedNode)
+                selectedNode.classed('hl', false)
+            selectedNode = sel
+            selectedNode.classed('hl', true)
+            d3.select('#selectedValue').text(sel.data()[0].value)
+        }
+
         function drawNodes(svg, nodeValues) {
             function getNodeData(layerIdx, nodeIdx, value) {
                 var originX = 10
@@ -125,6 +150,7 @@
                              .data(function (d) { return d; })
             nodes.enter().append("svg:rect")
                  .attr("class", "node")
+                 .on('click', function() { setSelected(d3.select(this)) })
             nodes.attr("x", function(d) { return d.x; })
                  .attr("y", function(d) { return d.y; })
                  .attr('rx', 10)
@@ -133,7 +159,7 @@
                  .attr("height", function(d) { return d.height; })
                  .style("fill", function(d) { var v = Math.floor(255 * (1 - d.value)); return "rgb("+v+","+v+","+v+")" })
                  .append("svg:title")
-                 .text(function(d) { return d.value; });
+                 .text(function(d) { return d.value; })
         }
 
         var weights = [
