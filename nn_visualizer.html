@@ -166,7 +166,7 @@
                  .attr('class', 'node')
                  .on('click', function() { updateSelectedNode(d3.select(this)) })
                  .append('svg:title')
-                 .text('fghf')
+                 .text('')
             nodes.attr('x', function(d) { return d.x; })
                  .attr('y', function(d) { return d.y; })
                  .attr('rx', function(d) { return d.cornerRadius; })
@@ -186,6 +186,8 @@
             var gradient = inputGradient(layerIdx, nodeIdx, weights, feedForward(weights, input))
             for (var i = 0; i < gradient.length; i++) {
                 input[i] += gradient[i] * sign
+                if (input[i] < 0) input[i] = 0
+                if (input[i] > 1) input[i] = 1
             }
             drawNN(weights, input)
             updateSelectedNode(selectedNode)
