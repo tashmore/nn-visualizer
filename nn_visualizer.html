@@ -97,7 +97,7 @@
                             .style('stroke', function(d) { return d.weight > 0 ? 'blue' : 'red' })
         }
 
-        function setSelected(sel) {
+        function updateSelectedNode(sel) {
             if (selectedNode)
                 selectedNode.classed('hl', false)
             selectedNode = sel
@@ -139,7 +139,7 @@
                              .data(function (d) { return d; })
             nodes.enter().append('svg:rect')
                  .attr('class', 'node')
-                 .on('click', function() { setSelected(d3.select(this)) })
+                 .on('click', function() { updateSelectedNode(d3.select(this)) })
                  .append('svg:title')
                  .text('fghf')
             nodes.attr('x', function(d) { return d.x; })
@@ -163,6 +163,7 @@
                 input[i] += gradient[i] * sign
             }
             drawNN(weights, input)
+            updateSelectedNode(selectedNode)
         }
 
         weights = [
@@ -175,7 +176,7 @@
         drawNN(weights, input)
 
         $(window).keypress(function(e) {
-            var code = e.keyCode || e.which
+            var code = e.which
             console.log(code)
             switch (code) {
             case 97:
