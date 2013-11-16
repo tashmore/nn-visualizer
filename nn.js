@@ -26,7 +26,7 @@ function inputGradient(fromLayer, fromNode, weights, values) {
         var isOutputLayer = layerIdx == values.length - 1
         for (var nodeIdx = 0; nodeIdx < values[layerIdx].length; nodeIdx++) {
             var isBiasNode = (nodeIdx == values[layerIdx].length - 1) && !isOutputLayer
-            var nodeValue = values[layerIdx][nodeIdx]
+            var nodeValue = values[layerIdx][nodeIdx] * .9 + .1 // fudge so that (1 - nodeValue) * nodeValue doesn't vanish
             var delta
             if (isBiasNode) {
                 delta = 0
