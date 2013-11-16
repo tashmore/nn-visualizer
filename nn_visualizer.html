@@ -107,18 +107,43 @@
 
         function drawNodes(svg, nodeValues) {
             function getNodeData(layerIdx, nodeIdx, value) {
+                if (layerIdx == 0) return getInputNodeData(layerIdx, nodeIdx, value)
+                else return getHiddenNodeData(layerIdx, nodeIdx, value)
+            }
+
+            function getInputNodeData(layerIdx, nodeIdx, value) {
                 var originX = 10
+                var originY = 10
+                var width = 10
+                var height = 10
+
+                var row = nodeIdx % 16
+                var col = (nodeIdx - (nodeIdx % 16)) / 16
+
+                return {x: originX + width * row,
+                        y: originY + col * height,
+                        width: width,
+                        height: height,
+                        layerIdx: layerIdx,
+                        nodeIdx: nodeIdx,
+                        value: nodeValues[layerIdx][nodeIdx]}
+            }
+
+            function getHiddenNodeData(layerIdx, nodeIdx, value) {
+                var originX = 100
                 var originY = 10
                 var width = 10
                 var height = 10
                 var wPadding = 200
                 var hPadding = 20
+                var cornerRadius = 10
                 return {x: originX + layerIdx * (width + wPadding),
                         y: originY + nodeIdx * (height + hPadding),
                         width: width,
                         height: height,
                         layerIdx: layerIdx,
                         nodeIdx: nodeIdx,
+                        cornerRadius: cornerRadius,
                         value: nodeValues[layerIdx][nodeIdx]}
             }
 
@@ -144,8 +169,8 @@
                  .text('fghf')
             nodes.attr('x', function(d) { return d.x; })
                  .attr('y', function(d) { return d.y; })
-                 .attr('rx', 10)
-                 .attr('ry', 10)
+                 .attr('rx', function(d) { return d.cornerRadius; })
+                 .attr('ry', function(d) { return d.cornerRadius; })
                  .attr('width', function(d) { return d.width; })
                  .attr('height', function(d) { return d.height; })
                  .style('fill', function(d) { var v = Math.floor(255 * (1 - d.value)); return 'rgb('+v+','+v+','+v+')' })
