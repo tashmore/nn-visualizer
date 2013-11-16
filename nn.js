@@ -31,8 +31,7 @@ function inputGradient(fromLayer, fromNode, weights, values) {
             if (isBiasNode) {
                 delta = 0
             } else if (layerIdx == fromLayer && nodeIdx == fromNode) {
-                // delta = (1 - nodeValue) * nodeValue * (1 - nodeValue)
-                delta = 0.1
+                delta = (1 - nodeValue) * nodeValue * (1 - nodeValue)
             } else if (layerIdx >= fromLayer) {
                 delta = 0
             } else {
