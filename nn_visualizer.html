@@ -19,6 +19,10 @@
         .node.hl {
             stroke: red;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
@@ -73,6 +77,8 @@
                         y1: fromNode.y + fromNode.height/2,
                         x2: toNode.x + padding,
                         y2: toNode.y + toNode.height/2,
+                        fromNode: fromNode,
+                        toNode: toNode,
                         weight: weight}
             }
 
@@ -103,9 +109,14 @@
             selectedNode = sel
             selectedNode.classed('hl', true)
 
-            var isInputNode = selectedNode.data()[0].layerIdx == 0
-            if (isInputNode) {
-                var val = input[selectedNode.data()[0].nodeIdx]
+            var layerIdx = selectedNode.data()[0].layerIdx
+            var nodeIdx = selectedNode.data()[0].nodeIdx
+
+            var isInputNode = layerIdx == 0
+            var isOutputNode = layerIdx == weights.length
+            var isBiasNode = !isOutputNode && nodeIdx == weights[layerIdx].length - 1
+            if (isInputNode && !isBiasNode) {
+                var val = input[nodeIdx]
                 if (val < 0.1) val = 1
                 else val = 0
                 input[selectedNode.data()[0].nodeIdx] = val
@@ -113,6 +124,18 @@
             }
 
             d3.select('#selectedValue').text(selectedNode.data()[0].value)
+
+            hideNonAdjacentEdges(layerIdx, nodeIdx)
+        }
+
+        function hideNonAdjacentEdges(selectedLayerIdx, selectedNodeIdx) {
+            svg.select('#edges')
+               .selectAll('.edge')
+               .classed('hidden', function (d) {
+                   var fromNodeSelected = d.fromNode.layerIdx == selectedLayerIdx && d.fromNode.nodeIdx == selectedNodeIdx
+                   var toNodeSelected = d.toNode.layerIdx == selectedLayerIdx && d.toNode.nodeIdx == selectedNodeIdx
+                   return !(fromNodeSelected || toNodeSelected)
+                })
         }
 
         function drawNodes(svg, nodeValues) {
