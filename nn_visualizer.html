@@ -6,7 +6,11 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="nn.js"></script>
     <style type="text/css">
-        #net {
+        body {
+            padding: 20px;
+        }
+
+        div.center {
             margin: 0 auto;
             text-align: center;
         }
@@ -23,25 +27,30 @@
         .hidden {
             display: none;
         }
+
+        .controls {
+            margin-bottom: 20px;
+            font-size: large;
+        }
+
+        button {
+            font-size: large;
+        }
+
     </style>
 </head>
 
 <body>
     <h1>Neural Net Visualizer</h1>
-    <code>
-     <div style="width:100%">
-         <div id='input'></div>
-         <div id='net'></div>
-         <div id='output'></div>
-         <div style="width:100%" id='bottom'>
-             Selected node value: <span id='selectedValue'>none</span>
-             <div>
-             <button onclick="javascript:gradientAscent(1)">Gradient (A)scent</button>
-             <button onclick="javascript:gradientAscent(-1)">Gradient (D)escent</button>
-             </div>
-         </div>
-     </div>
-</code>
+        <div class="controls">
+            Selected node value: <span id='selectedValue'>none</span>
+            <br/><br/>
+            <div>
+            <button onclick="javascript:gradientAscent(1)">Gradient (A)scent</button>
+            <button onclick="javascript:gradientAscent(-1)">Gradient (D)escent</button>
+            </div>
+        </div>
+        <div id='net'></div>
 
     <script type="text/javascript">
         var svg;
