@@ -128,13 +128,19 @@
             hideNonAdjacentEdges(layerIdx, nodeIdx)
         }
 
-        function hideNonAdjacentEdges(selectedLayerIdx, selectedNodeIdx) {
+        function hideNonAdjacentEdges(layerIdx, nodeIdx) {
             svg.select('#edges')
                .selectAll('.edge')
                .classed('hidden', function (d) {
-                   var fromNodeSelected = d.fromNode.layerIdx == selectedLayerIdx && d.fromNode.nodeIdx == selectedNodeIdx
-                   var toNodeSelected = d.toNode.layerIdx == selectedLayerIdx && d.toNode.nodeIdx == selectedNodeIdx
-                   return !(fromNodeSelected || toNodeSelected)
+                   var fromSelectedLayer = d.fromNode.layerIdx == layerIdx
+                   var toSelectedLayer = d.toNode.layerIdx == layerIdx
+                   var fromSelectedNodeIdx = d.fromNode.nodeIdx == nodeIdx
+                   var toSelectedNodeIdx = d.toNode.nodeIdx == nodeIdx
+
+                   var hideLayer = fromSelectedLayer || toSelectedLayer
+                   var includesSelectedNode = (fromSelectedLayer && fromSelectedNodeIdx) || (toSelectedLayer && toSelectedNodeIdx)
+                   var shouldHide = hideLayer && !includesSelectedNode
+                   return shouldHide
                 })
         }
 
