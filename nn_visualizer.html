@@ -241,7 +241,7 @@
                 if (input[i] > 1) input[i] = 1
             }
             drawNN(weights, input)
-            updateSelectedNode(selectedNode)
+            d3.select('#selectedValue').text(selectedNode.data()[0].value)
         }
 
         weights = [
