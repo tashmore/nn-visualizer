@@ -38,6 +38,15 @@
             font-size: large;
         }
 
+        .example {
+            padding: 5px;
+        }
+
+        #examples {
+            width: 800px;
+            word-wrap: break-word;
+        }
+
     </style>
 </head>
 
@@ -53,8 +62,8 @@
     </div>
     <div>
         Examples:
-        <span id="examples">
-        </span>
+        <div id="examples">
+        </div>
     </div>
     <div id='net'></div>
 
@@ -271,10 +280,12 @@
             .enter()
               .append('a')
               .attr('href', '#')
-              .text(function(d, i) { return i })
+              .attr('class', 'example')
+              .text(function(d, i) { return d[d.length - 1] })
               .on('click', function(d) {
                 input = d.slice(0)
-                input[input.length - 1] = 1 // NN expects a bias on the input
+                // replace the output digit with a bias that the NN expects
+                input[input.length - 1] = 1
                 drawNN(weights, input)
               })
         })
