@@ -128,6 +128,8 @@
         }
 
         function updateSelectedNode(sel) {
+            console.log("setting selected node to :")
+            console.log(sel)
             if (selectedNode)
                 selectedNode.classed('hl', false)
             selectedNode = sel
@@ -289,6 +291,9 @@
         
         initCanvas()
         drawNN(weights, input)
+        var nodes = d3.selectAll('.node')[0]
+        var firstOutputNode = nodes[nodes.length - weights[weights.length - 1].length + 1]
+        updateSelectedNode(d3.select(firstOutputNode))
 
         $(window).keypress(function(e) {
             var code = e.which
